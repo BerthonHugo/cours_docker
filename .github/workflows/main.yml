@@ -28,23 +28,20 @@ jobs:
       - name: Build and push image backend
         uses: docker/build-push-action@v5
         with:
-          # relative path to the place where source code with Dockerfile is located
           context: ./backend
-          # Note: tags has to be all lower-case
-          tags:  ${{secrets.DOCKER_USERNAME}}/ops-backend
-          # build on feature branches, push only on main branch
+          tags:  ${{secrets.DOCKER_USERNAME}}/tp-backend
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push image database
         uses: docker/build-push-action@v5
         with:
           context: ./database
-          tags:  ${{secrets.DOCKER_USERNAME}}/ops-database
+          tags:  ${{secrets.DOCKER_USERNAME}}/tp-database
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push image frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./http
-          tags:  ${{secrets.DOCKER_USERNAME}}/ops-frontend
+          context: ./http_server
+          tags:  ${{secrets.DOCKER_USERNAME}}/tp-httpd
           push: ${{ github.ref == 'refs/heads/main' }}
