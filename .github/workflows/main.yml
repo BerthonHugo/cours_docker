@@ -1,64 +1,50 @@
-name: CI devops 2023
+name: Push images
 on:
-  #to begin you want to launch this job in main and develop
-  push:
-    branches: 
+  #Runs when 'Run tests' succeeds and runs on main
+  workflow_run:
+    workflows:
+      - Run tests
+    types:
+      - completed
+    branches:
       - main
-      - develop
-  pull_request:
 
 jobs:
-  test-backend: 
-    runs-on: ubuntu-22.04
-    steps:
-     #checkout your github code using actions/checkout@v2.5.0
-      - uses: actions/checkout@v4
-
-     #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with: 
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
-
-
-     #finally build your app with the latest command
-      - name: Build and test with Maven
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=BerthonHugo_cours_docker -Dsonar.organization=berthonhugo -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file backend/pom.xml
- 
+  # define job to build and publish docker image
   build-and-push-docker-image:
-    needs: test-backend
+    name: Push the images to Docker Hub
     runs-on: ubuntu-22.04
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-  # LOGIN
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_SECRET }}
 
-  # BUILD AND PUSH IMAGES TO DOCKER
-      - name: Build image and push backend
+      - name: Build and push image backend
         uses: docker/build-push-action@v5
         with:
+          # relative path to the place where source code with Dockerfile is located
           context: ./backend
-          tags:  ${{secrets.DOCKER_USERNAME}}/tp-backend:v0.1
+          # Note: tags has to be all lower-case
+          tags:  ${{secrets.DOCKER_USERNAME}}/ops-backend
+          # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Build image and push database
+      - name: Build and push image database
         uses: docker/build-push-action@v5
         with:
           context: ./database
-          tags:  ${{secrets.DOCKER_USERNAME}}/tp-database:v0.1
+          tags:  ${{secrets.DOCKER_USERNAME}}/ops-database
           push: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Build image and push httpd
+      - name: Build and push image frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./http_server
-          tags:  ${{secrets.DOCKER_USERNAME}}/tp-httpd:v0.1
+          context: ./http
+          tags:  ${{secrets.DOCKER_USERNAME}}/ops-frontend
           push: ${{ github.ref == 'refs/heads/main' }}
