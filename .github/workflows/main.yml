@@ -27,35 +27,35 @@ jobs:
       - name: Build and test with Maven
         run: mvn -B package --file backend/pom.xml
 
-build-and-push-docker-image:
-  needs: test-backend
-  runs-on: ubuntu-22.04
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    build-and-push-docker-image:
+      needs: test-backend
+      runs-on: ubuntu-22.04
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-# LOGIN
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_SECRET }}
+    # LOGIN
+        - name: Login to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_SECRET }}
 
-# BUILD AND PUSH IMAGES TO DOCKER
-    - name: Build image and push backend
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend
-        tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/backend
+    # BUILD AND PUSH IMAGES TO DOCKER
+        - name: Build image and push backend
+          uses: docker/build-push-action@v5
+          with:
+            context: ./backend
+            tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/backend
 
-    - name: Build image and push database
-      uses: docker/build-push-action@v5
-      with:
-        context: ./database
-        tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/database
+        - name: Build image and push database
+          uses: docker/build-push-action@v5
+          with:
+            context: ./database
+            tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/database
 
-    - name: Build image and push httpd
-      uses: docker/build-push-action@v5
-      with:
-        context: ./http_server
-        tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/http_server
+        - name: Build image and push httpd
+          uses: docker/build-push-action@v5
+          with:
+            context: ./http_server
+            tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/http_server
