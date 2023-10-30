@@ -46,16 +46,19 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./backend
-          tags:  ${{secrets.DOCKER_SECRET}}/cours_docker-backend
+          tags:  ${{secrets.DOCKER_SECRET}}/cours_docker:v0.1
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v5
         with:
           context: ./database
-          tags:  ${{secrets.DOCKER_SECRET}}/cours_docker-database
+          tags:  ${{secrets.DOCKER_SECRET}}/cours_docker:v0.1
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v5
         with:
           context: ./http_server
-          tags:  ${{secrets.DOCKER_SECRET}}/cours_docker-http_server
+          tags:  ${{secrets.DOCKER_SECRET}}/cours_docker:v0.1
+          push: ${{ github.ref == 'refs/heads/main' }}
