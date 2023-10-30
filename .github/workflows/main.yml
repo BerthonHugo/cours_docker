@@ -27,40 +27,38 @@ jobs:
       - name: Build and test with Maven
         run: mvn -B verify sonar:sonar -Dsonar.projectKey=BerthonHugo_cours_docker -Dsonar.organization=berthonhugo -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file backend/pom.xml
  
+  build-and-push-docker-image:
+    needs: test-backend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-build-and-push-docker-image:
- needs: test-backend
- # run only when code is compiling and tests are passing
- runs-on: ubuntu-22.04
+  # LOGIN
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_SECRET }}
 
- # steps to perform in job
- steps:
-  - name: Checkout code
-    uses: actions/checkout@v4
+  # BUILD AND PUSH IMAGES TO DOCKER
+      - name: Build image and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          tags:  ${{secrets.DOCKER_USERNAME}}/tp-backend:v0.1
+          push: ${{ github.ref == 'refs/heads/main' }}
 
-# LOGIN
-  - name: Login to Docker Hub
-    uses: docker/login-action@v3
-    with:
-      username: ${{ secrets.DOCKER_USERNAME }}
-      password: ${{ secrets.DOCKER_SECRET }}
+      - name: Build image and push database
+        uses: docker/build-push-action@v5
+        with:
+          context: ./database
+          tags:  ${{secrets.DOCKER_USERNAME}}/tp-database:v0.1
+          push: ${{ github.ref == 'refs/heads/main' }}
 
-# BUILD AND PUSH IMAGES TO DOCKER
-  - name: Build image and push backend
-    uses: docker/build-push-action@v5
-    with:
-      context: ./backend
-      tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/backend
-
-  - name: Build image and push database
-    uses: docker/build-push-action@v5
-    with:
-      context: ./database
-      tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/database
-
-  - name: Build image and push httpd
-    uses: docker/build-push-action@v5
-    with:
-      context: ./http_server
-      # Note: tags has to be all lower-case
-      tags:  ${{secrets.DOCKER_SECRET}}/cours_docker/http_server
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v5
+        with:
+          context: ./http_server
+          tags:  ${{secrets.DOCKER_USERNAME}}/tp-httpd:v0.1
+          push: ${{ github.ref == 'refs/heads/main' }}
