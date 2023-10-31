@@ -29,6 +29,20 @@ services:
             - my-network
         depends_on:
             - backend
+    
+    frontend:
+        build: ./front
+
+        networks:
+            - my-network
+
+        ports:
+            - "8080:80"
+
+        container_name: frontend
+
+        depends_on:
+            - backend
 
 networks:
     my-network: {}
