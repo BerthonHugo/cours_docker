@@ -39,9 +39,16 @@ jobs:
           tags:  ${{secrets.DOCKER_USERNAME}}/tp-database
           push: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Build and push image frontend
+      - name: Build and push image httpd proxy
         uses: docker/build-push-action@v5
         with:
           context: ./http_server
           tags:  ${{secrets.DOCKER_USERNAME}}/tp-httpd
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push image frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./front
+          tags:  ${{secrets.DOCKER_USERNAME}}/tp-front
           push: ${{ github.ref == 'refs/heads/main' }}
