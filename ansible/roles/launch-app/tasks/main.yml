@@ -1,0 +1,9 @@
+---
+# tasks file for roles/launch-app
+
+- name: Create a backend container
+  community.docker.docker_container:
+    name: docker_tp_backend
+    image: hberthon/tp-backend
+    networks:
+     - name: network

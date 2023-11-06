@@ -1,0 +1,5 @@
+---
+# tasks file for volume
+- name: Create a volume
+  docker_volume:
+    name: persistance

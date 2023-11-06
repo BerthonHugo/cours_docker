@@ -1,0 +1,10 @@
+---
+# tasks file for roles/launch-database
+- name: Create a database container
+  community.docker.docker_container:
+    name: db
+    image: hberthon/tp-database
+    volumes:
+      - persistance:/var/lib/postgresql/data
+    networks:
+      - name: network
